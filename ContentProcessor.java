@@ -3,13 +3,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ContentProcessor {
 
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.out.println("Usage: java ContentProcessor <file_path>");
+            System.out.println("Insufficient arguments");
             return;
         }
 
@@ -26,8 +25,6 @@ public class ContentProcessor {
                 threads[i].start();
                 i = (i + 1) % threads.length;
             }
-
-            //Thread.sleep(100); // Give some time for threads to finish before printing results
 
             for (Thread thread : threads) {
                 if (thread != null) {
@@ -117,11 +114,10 @@ class LineProcessor implements Runnable {
                 lineSpaces++;
             } else if (c == '\t') {
                 lineTabs++;
-            } else if (isSpecialCharacter(c)) {
+            } else if (!Character.isLetterOrDigit(c)) {
                 Map<Character, Integer> specialCharCounts = content.getSpecialCharCounts();
                 synchronized (specialCharCounts) {
                     specialCharCounts.put(c, specialCharCounts.getOrDefault(c, 0) + 1);
-                    content.setSpecialCharCounts(specialCharCounts);
                 }
             }
         }
@@ -131,9 +127,5 @@ class LineProcessor implements Runnable {
             content.setTotalTabs(lineTabs + content.getTotalTabs());
         }
       
-    }
-
-    private boolean isSpecialCharacter(char c) {
-        return c == '$' || c == '&' || c == '@' || c == '%';
     }
 }
