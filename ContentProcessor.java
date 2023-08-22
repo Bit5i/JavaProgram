@@ -108,16 +108,17 @@ class ChunkProcessor implements Callable<Content> {
                             lineSpaces++;
                         } else if (c == '\t') {
                             lineTabs++;
-                        } else if (isSpecialCharacter(c)) {
+                        } else if (!Character.isLetterOrDigit(c)) {
                             specialCharCounts.merge(c, 1, Integer::sum);
                         }
-                    }
+					}
 
                     totalSpaces += lineSpaces;
                     totalTabs += lineTabs;
                     linesProcessed++;
                 }
 
+				// calculate offset in file
                 currentOffset += line.length() + System.lineSeparator().length();
 
                 if (currentOffset >= endOffset) {
@@ -131,9 +132,7 @@ class ChunkProcessor implements Callable<Content> {
         return new Content(linesProcessed, totalSpaces, totalTabs, specialCharCounts);
     }
 
-    private boolean isSpecialCharacter(char c) {
-        return c == '$' || c == '&' || c == '@' || c == '%' || c == '*';
-    }
+    
 }
 
 class Content {
